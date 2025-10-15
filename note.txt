@@ -1,0 +1,26 @@
+// delete prev migration when if needed!
+npm run migration:generate src/database/migrations/migrationOne
+npm run migration:run
+npm run seed:run        // check which cmd addded on package.json
+
+
+
+# solve all error in eslint based on eslint config
+    $ npx eslint "{src,apps,libs,test}/**/*.ts" --fix
+
+
+# commit type
+    git commit -m "style: format code and fix linting issues"
+
+
+
+
+
+
+
+
+
+
+
+
+---

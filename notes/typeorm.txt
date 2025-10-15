@@ -1,0 +1,59 @@
+## 1 ##
+
+         @ManyToOne(() => StatusEntity, {
+            eager: true,
+        })
+        status?: StatusEntity;
+
+        -  eager: true
+                This tells TypeORM to automatically load the status relationship every time the parent entity is loaded.
+    
+
+## 2 ##
+
+        -> Entity
+                export class UserEntity extends EntityRelationalHelper {}
+        
+        -> EntityRelationalHelper
+                export class EntityRelationalHelper extends BaseEntity {
+                        __entity?: string;
+                        @AfterLoad()
+                                setEntityName() {
+                                this.__entity = this.constructor.name;
+                        }
+                        toJSON() {
+                                return instanceToPlain(this);
+                        }
+                }
+
+        
+        // When fetch the userEntity data this automatically fetch all relational table data
+        // also add a field __entity, this could be hide
+
+
+
+
+## 3 ##
+
+        ->  
+                @Exclude({ toPlainOnly: true })
+                password?: string;
+
+           // not to show password when view
+        
+
+        ->      
+                 @Expose({ groups: ["me", "admin"] })
+                 email: string | null;
+
+                // email can be view only me and admin type users
+        
+
+                // this is Controller, here set the group
+                @SerializeOptions({
+                  groups: ["admin"],
+                })
+                @Get(":id")
+                findOne(@Param("id") id: User["id"]): Promise<NullableType<User>> {
+                  return this.usersService.findById(id);
+                }

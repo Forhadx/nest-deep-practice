@@ -1,0 +1,48 @@
+
+# Sort brief
+    - admin
+    - employee
+    - attendance
+    - payroll
+    - settings
+    - recruit
+
+
+    - designation
+    - shift
+    - leave management
+    - late management
+    - bonus management
+    - increment
+    - expense
+    - overtime
+
+    - department
+    - task
+    - loan
+
+
+-------------------------------------------------------------------
+employee    
+    - email
+    - password
+    - firstName
+    - lastName
+    - photo
+    - role
+    - status 
+
+
+    - phone
+    - altPhone
+    - presentAddress
+    - permanentAddress
+    - gender 
+    - DOB
+    - joining_date 
+
+    - documents[]
+
+    - departmentId 
+    - employmentType 
+    - designationId
