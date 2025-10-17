@@ -76,8 +76,8 @@ export class AdminController {
       });
     }
 
-    // return adminData;
-    return null;
+    return adminData;
+    // return null;
   }
 
   @ApiOkResponse({

@@ -281,7 +281,18 @@ export class AuthService {
       .update(randomStringGenerator())
       .digest("hex");
 
-    const user = await this.employeeService.findById(session.userId);
+    let user: Admin | Employee | null = null;
+
+    const [adminData, employeeData] = await Promise.all([
+      this.adminService.findById(session.userId),
+      this.employeeService.findById(session.userId),
+    ]);
+
+    if (adminData) {
+      user = adminData;
+    } else if (employeeData) {
+      user = employeeData;
+    }
 
     if (!user?.role) {
       throw new UnauthorizedException();

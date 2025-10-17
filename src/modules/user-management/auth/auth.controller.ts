@@ -83,6 +83,7 @@ export class AuthController {
   @UseGuards(AuthGuard("jwt-refresh"))
   @HttpCode(HttpStatus.OK)
   public refresh(@Request() request): Promise<RefreshResponseDto> {
+    // use refresh token
     return this.service.refreshToken({
       sessionId: request.user.sessionId,
       hash: request.user.hash,
