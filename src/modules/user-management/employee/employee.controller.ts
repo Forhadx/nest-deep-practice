@@ -22,12 +22,7 @@ import {
 import { Roles } from "../../../decorators/roles.decorator";
 import { ERole } from "../../../enums/roles.enum";
 import { AuthGuard } from "@nestjs/passport";
-
-import {
-  InfinityPaginationResponse,
-  InfinityPaginationResponseDto,
-} from "../../../utils/dto/infinity-pagination-response.dto";
-import { NullableType } from "../../../utils/types/nullable.type";
+import { InfinityPaginationResponse } from "../../../utils/dto/infinity-pagination-response.dto";
 import { RolesGuard } from "../../../guards/roles.guard";
 import { infinityPagination } from "../../../utils/infinity-pagination";
 import { Employee } from "./domain/employee";
@@ -55,7 +50,7 @@ export class EmployeeController {
   })
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createProfileDto: CreateEmployeeDto): Promise<Employee> {
+  create(@Body() createProfileDto: CreateEmployeeDto) {
     return this.employeeService.create(createProfileDto);
   }
 
@@ -67,10 +62,17 @@ export class EmployeeController {
   })
   @Get()
   @HttpCode(HttpStatus.OK)
-  async findAll(
-    @Query() query: QueryEmployeeDto,
-  ): Promise<InfinityPaginationResponseDto<Employee>> {
+  async findAll(@Query() query: QueryEmployeeDto) {
     console.log("query: ", query);
+
+    // throw new UnprocessableEntityException({
+    //         status: HttpStatus.UNPROCESSABLE_ENTITY,
+    //         errors: {
+    //           hash: `notFound`,
+    //         },
+    //       });
+
+    // throw new UnauthorizedException();
     // GET /users?page=1&limit=10&filters={"roles":[{"id":1}]}&sort=[{"orderBy":"email","order":"asc"}]
 
     const page = query?.page ?? 1;
@@ -105,7 +107,7 @@ export class EmployeeController {
     type: String,
     required: true,
   })
-  findOne(@Param("id") id: Employee["id"]): Promise<NullableType<Employee>> {
+  findOne(@Param("id") id: Employee["id"]) {
     return this.employeeService.findById(id);
   }
 
@@ -125,7 +127,7 @@ export class EmployeeController {
   update(
     @Param("id") id: Employee["id"],
     @Body() updateProfileDto: UpdateEmployeeDto,
-  ): Promise<NullableType<Employee>> {
+  ) {
     return this.employeeService.update(id, updateProfileDto);
   }
 
@@ -136,7 +138,7 @@ export class EmployeeController {
     required: true,
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param("id") id: Employee["id"]): Promise<void> {
+  remove(@Param("id") id: Employee["id"]) {
     return this.employeeService.remove(id);
   }
 }

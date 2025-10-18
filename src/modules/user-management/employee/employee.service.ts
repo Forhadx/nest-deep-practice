@@ -3,7 +3,6 @@ import {
   Injectable,
   UnprocessableEntityException,
 } from "@nestjs/common";
-import { NullableType } from "../../../utils/types/nullable.type";
 import { FilterEmployeeDto, SortUserDto } from "./dto/query-employee.dto";
 import bcrypt from "bcryptjs";
 import { AuthProvidersEnum } from "../auth/auth-providers.enum";
@@ -16,7 +15,6 @@ import { FindOptionsWhere, In, Repository } from "typeorm";
 import { Employee } from "./domain/employee";
 import { CreateEmployeeDto } from "./dto/create-employee.dto";
 import { UpdateEmployeeDto } from "./dto/update-employee.dto";
-import { EmployeeMapper } from "./mappers/employee.mapper";
 
 @Injectable()
 export class EmployeeService {
@@ -26,7 +24,7 @@ export class EmployeeService {
     private readonly filesService: FilesService,
   ) {}
 
-  async create(createUserDto: CreateEmployeeDto): Promise<Employee> {
+  async create(createUserDto: CreateEmployeeDto) {
     let password: string | undefined = undefined;
 
     if (createUserDto.password) {
@@ -68,7 +66,7 @@ export class EmployeeService {
       photo = null;
     }
 
-    const persistenceModel = EmployeeMapper.toPersistence({
+    const persistenceModel = {
       firstName: createUserDto?.firstName,
       lastName: createUserDto?.lastName,
       email: email,
@@ -78,13 +76,13 @@ export class EmployeeService {
       status: createUserDto?.status,
       provider: createUserDto?.provider ?? AuthProvidersEnum.email,
       socialId: createUserDto?.socialId,
-    } as Employee);
+    };
 
     const newEntity = await this.employeeRepository.save(
       this.employeeRepository.create(persistenceModel),
     );
 
-    return EmployeeMapper.toDomain(newEntity);
+    return newEntity;
   }
 
   async findManyWithPagination({
@@ -95,13 +93,20 @@ export class EmployeeService {
     filterOptions?: FilterEmployeeDto | null;
     sortOptions?: SortUserDto[] | null;
     paginationOptions: IPaginationOptions;
-  }): Promise<Employee[]> {
+  }) {
     const where: FindOptionsWhere<EmployeeEntity> = {};
     // if (filterOptions?.roles?.length) {
     //   where.role = filterOptions.roles.map((role) => ({
     //     id: role.id,
     //   }));
     // }
+
+    // throw new UnprocessableEntityException({
+    //         status: HttpStatus.UNPROCESSABLE_ENTITY,
+    //         errors: {
+    //           hash: `notFound 2`,
+    //         },
+    //       });
 
     if (filterOptions?.roles?.length) {
       where.role = In(filterOptions.roles);
@@ -122,41 +127,38 @@ export class EmployeeService {
       order: order, //{ email: 'asc' }
     });
 
-    return entities.map((user) => EmployeeMapper.toDomain(user));
+    console.log("entities: ", entities);
+
+    return entities;
   }
 
-  async findById(id: Employee["id"]): Promise<NullableType<Employee>> {
+  async findById(id: Employee["id"]) {
     const entity = await this.employeeRepository.findOne({
       where: { id: id },
     });
 
-    // console.log("entity: ", entity);
-
-    return entity ? EmployeeMapper.toDomain(entity) : null;
+    return entity ? entity : null;
   }
 
-  async findByIds(ids: Employee["id"][]): Promise<Employee[]> {
+  async findByIds(ids: Employee["id"][]) {
     const entities = await this.employeeRepository.find({
       where: { id: In(ids) },
     });
 
-    return entities.map((user) => EmployeeMapper.toDomain(user));
+    return entities;
   }
 
-  async findByEmail(email: Employee["email"]): Promise<NullableType<Employee>> {
+  async findByEmail(email: Employee["email"]) {
     if (!email) return null;
 
     const entity = await this.employeeRepository.findOne({
       where: { email },
     });
 
-    return entity ? EmployeeMapper.toDomain(entity) : null;
+    return entity ? entity : null;
   }
 
-  async update(
-    id: Employee["id"],
-    updateUserDto: UpdateEmployeeDto,
-  ): Promise<Employee | null> {
+  async update(id: Employee["id"], updateUserDto: UpdateEmployeeDto) {
     let password: string | undefined = undefined;
 
     if (updateUserDto.password) {
@@ -226,15 +228,13 @@ export class EmployeeService {
     }
 
     const updatedEntity = await this.employeeRepository.save(
-      this.employeeRepository.create(
-        EmployeeMapper.toPersistence({
-          ...EmployeeMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
+      this.employeeRepository.create({
+        ...entity,
+        ...payload,
+      }),
     );
 
-    return EmployeeMapper.toDomain(updatedEntity);
+    return updatedEntity;
   }
 
   async remove(id: Employee["id"]): Promise<void> {
