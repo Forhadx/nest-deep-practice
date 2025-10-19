@@ -12,7 +12,6 @@ import { FileType } from "../../../common/files/domain/file";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EmployeeEntity } from "./entities/employee.entity";
 import { FindOptionsWhere, In, Repository } from "typeorm";
-import { Employee } from "./domain/employee";
 import { CreateEmployeeDto } from "./dto/create-employee.dto";
 import { UpdateEmployeeDto } from "./dto/update-employee.dto";
 
@@ -35,7 +34,8 @@ export class EmployeeService {
     let email: string | null = null;
 
     if (createUserDto.email) {
-      const userObject = await this.findByEmail(email);
+      const userObject = await this.findByEmail(createUserDto.email);
+      console.log("userObject: ", userObject);
       if (userObject) {
         throw new UnprocessableEntityException({
           status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -95,18 +95,6 @@ export class EmployeeService {
     paginationOptions: IPaginationOptions;
   }) {
     const where: FindOptionsWhere<EmployeeEntity> = {};
-    // if (filterOptions?.roles?.length) {
-    //   where.role = filterOptions.roles.map((role) => ({
-    //     id: role.id,
-    //   }));
-    // }
-
-    // throw new UnprocessableEntityException({
-    //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-    //         errors: {
-    //           hash: `notFound 2`,
-    //         },
-    //       });
 
     if (filterOptions?.roles?.length) {
       where.role = In(filterOptions.roles);
@@ -132,7 +120,42 @@ export class EmployeeService {
     return entities;
   }
 
-  async findById(id: Employee["id"]) {
+  async findMany({
+    filterOptions,
+    sortOptions,
+    paginationOptions,
+  }: {
+    filterOptions?: FilterEmployeeDto | null;
+    sortOptions?: SortUserDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }) {
+    const where: FindOptionsWhere<EmployeeEntity> = {};
+
+    if (filterOptions?.roles?.length) {
+      where.role = In(filterOptions.roles);
+    }
+
+    const order = sortOptions?.reduce(
+      (accumulator, sort) => ({
+        ...accumulator,
+        [sort.orderBy]: sort.order,
+      }),
+      {},
+    );
+
+    const entities = await this.employeeRepository.find({
+      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+      take: paginationOptions.limit,
+      where: where, //  { role: [ { id: 1 } ] }
+      order: order, //{ email: 'asc' }
+    });
+
+    console.log("entities: ", entities);
+
+    return entities;
+  }
+
+  async findById(id: string) {
     const entity = await this.employeeRepository.findOne({
       where: { id: id },
     });
@@ -140,7 +163,7 @@ export class EmployeeService {
     return entity ? entity : null;
   }
 
-  async findByIds(ids: Employee["id"][]) {
+  async findByIds(ids: string[]) {
     const entities = await this.employeeRepository.find({
       where: { id: In(ids) },
     });
@@ -148,7 +171,7 @@ export class EmployeeService {
     return entities;
   }
 
-  async findByEmail(email: Employee["email"]) {
+  async findByEmail(email: string) {
     if (!email) return null;
 
     const entity = await this.employeeRepository.findOne({
@@ -158,7 +181,7 @@ export class EmployeeService {
     return entity ? entity : null;
   }
 
-  async update(id: Employee["id"], updateUserDto: UpdateEmployeeDto) {
+  async update(id: string, updateUserDto: UpdateEmployeeDto) {
     let password: string | undefined = undefined;
 
     if (updateUserDto.password) {
@@ -217,7 +240,7 @@ export class EmployeeService {
       status: updateUserDto?.status,
       provider: updateUserDto.provider,
       socialId: updateUserDto.socialId,
-    } as Employee;
+    };
 
     const entity = await this.employeeRepository.findOne({
       where: { id: id },
@@ -237,7 +260,7 @@ export class EmployeeService {
     return updatedEntity;
   }
 
-  async remove(id: Employee["id"]): Promise<void> {
+  async remove(id: string): Promise<void> {
     await this.employeeRepository.softDelete(id);
   }
 }
