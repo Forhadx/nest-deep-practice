@@ -21,12 +21,11 @@ import { RolesGuard } from "../../../guards/roles.guard";
 // import { infinityPagination } from "../../../utils/infinity-pagination";
 import { CreateEmployeeDto } from "./dto/create-employee.dto";
 import { UpdateEmployeeDto } from "./dto/update-employee.dto";
-import { QueryEmployeeDto } from "./dto/query-employee.dto";
 import { EmployeeService } from "./employee.service";
 import { PaginationQueryDto } from "../../../utils/dto/pagination.dto";
 import { findManyEmployeeDto } from "./dto/findMany-employee.dto";
 
-@Roles(ERole.Admin)
+@Roles(ERole.Admin, ERole.Employee)
 @UseGuards(AuthGuard("jwt"), RolesGuard)
 @Controller({
   path: "employee",
@@ -35,21 +34,12 @@ import { findManyEmployeeDto } from "./dto/findMany-employee.dto";
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  @SerializeOptions({
-    groups: ["admin"],
-  })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createProfileDto: CreateEmployeeDto) {
     return this.employeeService.create(createProfileDto);
   }
 
-  // @ApiOkResponse({
-  //   type: InfinityPaginationResponse(Employee),
-  // })
-  @SerializeOptions({
-    groups: ["admin"],
-  })
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(
@@ -98,18 +88,12 @@ export class EmployeeController {
     return list;
   }
 
-  @SerializeOptions({
-    groups: ["admin"],
-  })
   @Get(":id")
   @HttpCode(HttpStatus.OK)
   findOne(@Param("id") id: string) {
     return this.employeeService.findById(id);
   }
 
-  @SerializeOptions({
-    groups: ["admin"],
-  })
   @Patch(":id")
   @HttpCode(HttpStatus.OK)
   update(@Param("id") id: string, @Body() updateProfileDto: UpdateEmployeeDto) {
