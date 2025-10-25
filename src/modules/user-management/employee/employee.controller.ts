@@ -34,28 +34,20 @@ import { findManyEmployeeDto } from "./dto/findMany-employee.dto";
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  create(@Body() createProfileDto: CreateEmployeeDto) {
-    return this.employeeService.create(createProfileDto);
-  }
+  // @Post()
+  // @HttpCode(HttpStatus.CREATED)
+  // create(@Body() createProfileDto: CreateEmployeeDto) {
+  //   return this.employeeService.create(createProfileDto);
+  // }
 
-  @Get()
+  @Post("fetch")
   @HttpCode(HttpStatus.OK)
   async findAll(
-    @Body() body: findManyEmployeeDto,
+    @Body() body: any, //findManyEmployeeDto,
     @Query() query: PaginationQueryDto,
   ) {
     console.log("query: ", query);
 
-    // throw new UnprocessableEntityException({
-    //         status: HttpStatus.UNPROCESSABLE_ENTITY,
-    //         errors: {
-    //           hash: `notFound`,
-    //         },
-    //       });
-
-    // throw new UnauthorizedException();
     // GET /users?page=1&limit=10&filters={"roles":[{"id":1}]}&sort=[{"orderBy":"email","order":"asc"}]
 
     const page = query?.page ?? 1;
@@ -65,7 +57,7 @@ export class EmployeeController {
     }
 
     // return infinityPagination(
-    //   await this.employeeService.findManyWithPagination({
+    //   await this.employeeService.findManyWithPagination({ 
     //     filterOptions: query?.filters,
     //     sortOptions: query?.sort,
     //     paginationOptions: {

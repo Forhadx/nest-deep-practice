@@ -19,6 +19,10 @@ export class SortUserDto {
 }
 
 export class findManyEmployeeDto {
+  // @IsOptional()
+  // @IsString()
+  // values?: string;
+
   @IsOptional()
   @Transform(({ value }) =>
     value ? plainToInstance(FilterEmployeeDto, JSON.parse(value)) : undefined,

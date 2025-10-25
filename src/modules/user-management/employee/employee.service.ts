@@ -11,7 +11,7 @@ import { IPaginationOptions } from "../../../utils/types/pagination-options";
 import { FileType } from "../../../common/files/domain/file";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EmployeeEntity } from "./entities/employee.entity";
-import { FindOptionsWhere, In, Repository } from "typeorm";
+import { FindOptionsWhere, ILike, In, Repository } from "typeorm";
 import { CreateEmployeeDto } from "./dto/create-employee.dto";
 import { UpdateEmployeeDto } from "./dto/update-employee.dto";
 
@@ -146,7 +146,8 @@ export class EmployeeService {
     const entities = await this.employeeRepository.find({
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,
-      where: where, //  { role: [ { id: 1 } ] }
+      // where: where, //  { role: [ { id: 1 } ] }
+      where: [{ email: ILike(`%emp%`) }, { firstName: ILike(`%j%`) }],
       order: order, //{ email: 'asc' }
     });
 
