@@ -47,6 +47,21 @@ export class EmployeeService {
       email = createUserDto.email;
     }
 
+    let phone: string | null = null;
+
+    if (createUserDto.phone) {
+      const userObject = await this.findByPhone(createUserDto.phone);
+      if (userObject) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            phone: "phoneAlreadyExists",
+          },
+        });
+      }
+      phone = createUserDto.phone;
+    }
+
     let photo: FileType | null | undefined = undefined;
 
     if (createUserDto.photo?.id) {
@@ -70,6 +85,7 @@ export class EmployeeService {
       firstName: createUserDto?.firstName,
       lastName: createUserDto?.lastName,
       email: email,
+      phone: phone,
       password: password,
       photo: photo,
       // role: createUserDto?.role,
@@ -177,6 +193,16 @@ export class EmployeeService {
 
     const entity = await this.employeeRepository.findOne({
       where: { email },
+    });
+
+    return entity ? entity : null;
+  }
+
+  async findByPhone(phone: string) {
+    if (!phone) return null;
+
+    const entity = await this.employeeRepository.findOne({
+      where: { phone },
     });
 
     return entity ? entity : null;

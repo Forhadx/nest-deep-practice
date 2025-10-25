@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
+  IsString,
   MinLength,
 } from "class-validator";
 import { FileDto } from "../../../../common/files/dto/file.dto";
@@ -12,7 +13,10 @@ import { lowerCaseTransformer } from "../../../../utils/transformers/lower-case.
 import { EEmployeeStatus } from "../../../../enums/employeeStatus.enum";
 
 export class CreateEmployeeDto {
-  @ApiProperty({ example: "test1@example.com", type: String })
+  @IsNotEmpty()
+  @IsString()
+  phone: string | null;
+
   @Transform(lowerCaseTransformer)
   @IsNotEmpty()
   @IsEmail()

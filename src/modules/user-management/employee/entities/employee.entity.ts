@@ -10,6 +10,9 @@ export class EmployeeEntity extends AbstractBaseEntity {
   @Column({ type: String, unique: true, nullable: true })
   email: string | null;
 
+  @Column({ type: String, unique: true, nullable: true })
+  phone: string | null;
+
   @Column({ nullable: true })
   password?: string;
 

@@ -10,7 +10,7 @@ import {
   Query,
   HttpStatus,
   HttpCode,
-  SerializeOptions,
+  // SerializeOptions,
   // UnprocessableEntityException,
 } from "@nestjs/common";
 import { Roles } from "../../../decorators/roles.decorator";
@@ -23,7 +23,7 @@ import { CreateEmployeeDto } from "./dto/create-employee.dto";
 import { UpdateEmployeeDto } from "./dto/update-employee.dto";
 import { EmployeeService } from "./employee.service";
 import { PaginationQueryDto } from "../../../utils/dto/pagination.dto";
-import { findManyEmployeeDto } from "./dto/findMany-employee.dto";
+// import { findManyEmployeeDto } from "./dto/findMany-employee.dto";
 
 @Roles(ERole.Admin, ERole.Employee)
 @UseGuards(AuthGuard("jwt"), RolesGuard)
@@ -34,11 +34,11 @@ import { findManyEmployeeDto } from "./dto/findMany-employee.dto";
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  // @Post()
-  // @HttpCode(HttpStatus.CREATED)
-  // create(@Body() createProfileDto: CreateEmployeeDto) {
-  //   return this.employeeService.create(createProfileDto);
-  // }
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() createProfileDto: CreateEmployeeDto) {
+    return this.employeeService.create(createProfileDto);
+  }
 
   @Post("fetch")
   @HttpCode(HttpStatus.OK)
@@ -57,7 +57,7 @@ export class EmployeeController {
     }
 
     // return infinityPagination(
-    //   await this.employeeService.findManyWithPagination({ 
+    //   await this.employeeService.findManyWithPagination({
     //     filterOptions: query?.filters,
     //     sortOptions: query?.sort,
     //     paginationOptions: {
